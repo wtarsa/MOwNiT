@@ -25,6 +25,19 @@ void fill_vector_with_numbers(std::vector<float> &numbers) {
     }
 }
 
+//2
+float kahan_sum(std::vector<float> &numbers){
+    float sum = 0.0f;
+    float err = 0.0f;
+    for(float &number: numbers){
+        float y = number - err;
+        float tmp = sum + y;
+        err = (tmp - sum) - y;
+        sum = tmp;
+    }
+    return sum;
+}
+
 int main() {
     //1.1
     std::vector<float> numbers;
@@ -48,13 +61,9 @@ int main() {
     sum = 0.0f;
     for (int i = 0; i < numbers.size(); i++) {
         sum += numbers[i];
-        if (i % 25000 == 0) add_errors.push_back(std::abs(i * 0.1634 - sum));
+        if (i % 25000 == 0) add_errors.push_back(std::abs(i * 0.1634 - sum)*100/sum);
     }
 
-    /*  std::cout << add_errors.size() << std::endl;
-      for(int i = 0; i < add_errors.size(); i++){
-          std::cout << add_errors[i] << std::endl;
-      }*/
 
     //1.4
     auto start_sum_rec = std::chrono::steady_clock::now();
@@ -75,7 +84,26 @@ int main() {
               << std::chrono::duration_cast<std::chrono::milliseconds>(end_sum_rec - start_sum_rec).count()
               << " ms" << std::endl;
 
-    for (float add_error : add_errors) {
+    //potrzebne do wypisania błędów do pliku w celu utworzenia wykresu.
+  /*  for (float add_error : add_errors) {
         std::cout << add_error << std::endl;
-    }
+    }*/
+
+    //2.1
+    auto start_sum_kahan = std::chrono::steady_clock::now();
+    sum = kahan_sum(numbers);
+    auto end_sum_kahan = std::chrono::steady_clock::now();
+    std::cout << "Suma wyznaczona algorytmem Kahana: " << std::setprecision(3) << sum << std::endl;
+    std::cout << "Błąd bezwzględny: " << std::setprecision(3) << correct_sum - sum << std::endl;
+    std::cout << "Błąd względny: " << std::setprecision(3) << (correct_sum - sum) * 100 / correct_sum << "%"
+              << std::endl;
+
+    //2.3
+    std::cout << "Czas wyznaczenia sumy algorytmem Kahana : "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end_sum_kahan - start_sum_kahan).count()
+              << " ms" << std::endl;
+    std::cout << "Czas wyznaczenia sumy rekurencyjnie : "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end_sum_rec - start_sum_rec).count()
+              << " ms" << std::endl;
+
 }
