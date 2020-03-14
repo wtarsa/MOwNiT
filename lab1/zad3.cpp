@@ -69,10 +69,5 @@ int main() {
     numbers.resize(50);
     fill_vector_with_numbers(numbers);
     double sum_kahan = kahan_sum(numbers);
-
-  /*  for(double number: numbers){
-        std::cout << std::setprecision(18) << number << std::endl;
-    }*/
-
     std::cout << std::setprecision(16) << "Suma wyliczona algorytmem Kahana: " << sum_kahan << std::endl;
 }

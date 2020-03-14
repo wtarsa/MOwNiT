@@ -3,7 +3,7 @@ from os import system
 
 errors =[]
 
-with open('wyniki.txt', 'r') as f:
+with open('zad1_wyniki.txt', 'r') as f:
     for item in f:
         errors.append(float(item));
 
