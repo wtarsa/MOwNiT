@@ -1,3 +1,4 @@
+#include <cmath>
 #include "aghMatrix.h"
 
 
@@ -114,14 +115,71 @@ AGHMatrix<T> AGHMatrix<T>::operator+(const AGHMatrix<T>& rhs)
 template<typename T>
 AGHMatrix<T> AGHMatrix<T>::operator*(const AGHMatrix<T>& rhs) 
 {
-    AGHMatrix<T> result(matrix);
+    AGHMatrix<T> result(rows, rhs.cols, 0);
     for(int r = 0; r < rows; r++){
         for(int c = 0; c < rhs.cols; c++){
-            result.matrix[r][c] += matrix[r][c];
+            for(int i = 0; i < rhs.rows; i++){
+                result.matrix[r][c] += matrix[r][i]*rhs.matrix[i][c];
+            }
         }
     }
     return result;
 }
+
+// Check whether the matrix is symmetric
+template<typename T>
+bool AGHMatrix<T>::symmetric() {
+    for(int r = 0; r < rows; r++){
+        for(int c = 0; c < cols; c++){
+            if(matrix[r][c] != matrix[c][r]) return false;
+        }
+    }
+    return true;
+}
+
+// Find complementary cofactor of matrix
+template<typename T>
+AGHMatrix<T> AGHMatrix<T>::complementary_cofactor(unsigned col, unsigned row) {
+    AGHMatrix<T> result(this->rows-1, this->cols-1, 0);
+    int r_shift = 0;
+    int c_shift = 0;
+    for(int r = 0; r < this->rows-1; r++){
+        if(r == row) r_shift = 1;
+        for(int c = 0; c < this->cols-1; c++){
+            if(c == col) c_shift = 1;
+            result.matrix[r][c] = this->matrix[r+r_shift][c+c_shift];
+        }
+        c_shift = 0;
+    }
+    return result;
+}
+
+// Find determinant of matrix using Laplace expansion
+template<typename T>
+T AGHMatrix<T>::find_determinant(AGHMatrix<T> rhs, unsigned size) {
+    T result = 0;
+    if(size == 1) return rhs.matrix[0][0];
+    if(size == 2) {
+        return rhs.matrix[0][0]*rhs.matrix[1][1]-
+               rhs.matrix[0][1]*rhs.matrix[1][0];
+    }
+    for(int col = 0; col < size; col++){
+        result += pow(-1, col+2) * rhs.matrix[0][col] * find_determinant(rhs.complementary_cofactor(col, 0), size-1);
+    }
+    return result;
+}
+
+template<typename T>
+AGHMatrix<T> AGHMatrix<T>::transpose() {
+    AGHMatrix<T> result(cols, rows, 0);
+    for(int r = 0; r < cols; r++){
+        for(int c = 0; c < rows; c++){
+            result.matrix[r][c] = matrix[c][r];
+        }
+    }
+    return result;
+}
+
 
 // Printing matrix                                                                                                                        
 template<typename T>
@@ -137,3 +195,4 @@ std::ostream& operator<<(std::ostream& stream, const AGHMatrix<T>& matrix)
   }
     stream << std::endl;
 }
+

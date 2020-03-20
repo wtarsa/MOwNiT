@@ -9,6 +9,7 @@ private:
     std::vector<std::vector<T>> matrix;
     unsigned rows;
     unsigned cols;
+    AGHMatrix<T> complementary_cofactor(unsigned col, unsigned row);
 
 public:
     AGHMatrix(const std::vector<std::vector<T>>& matrix);
@@ -33,6 +34,15 @@ public:
     // Access the row and column sizes                                                                                                                                                                                              
     unsigned get_rows() const;
     unsigned get_cols() const;
+
+    // Check whether the matrix is symmetric
+    bool symmetric();
+
+    // Find determinant
+    static T find_determinant(AGHMatrix<T> rhs, unsigned size);
+
+    AGHMatrix<T> transpose();
+
 };
 
 #include "aghMatrix.cpp"
