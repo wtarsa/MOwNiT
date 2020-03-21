@@ -47,6 +47,8 @@ public:
     void cholesky_decomposition(AGHMatrix<T> &L, AGHMatrix<T> &LT);
 
     AGHMatrix<T> gauss_elimination();
+
+    AGHMatrix<T> jacobi_method();
 };
 
 #include "aghMatrix.cpp"

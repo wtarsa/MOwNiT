@@ -90,5 +90,29 @@ int main()
     std::cout << std::fixed;
     std::cout << std::setprecision(2) << L_cholesky << std::endl;
     std::cout << std::setprecision(2) << LT_cholesky << std::endl;
+
+    //zadanie5
+    //basic test from wikipedia
+    std::vector<std::vector<double>> init_gauss {{ 2.0, 1.0, -1.0, 8.0 },
+                                                 { -3.0, -1.0, 2.0, -11.0 },
+                                                 { -2.0, 1.0, 2.0, -3.0 }};
+    AGHMatrix<double> mat_gauss(init_gauss);
+    std::cout << std::fixed;
+    std::cout << std::setprecision(2) << mat_gauss.gauss_elimination() << std::endl;
+    //test from lab:
+    std::vector<std::vector<double>> init_gauss_test {{ 0.0001, -5.0300, 5.8090, 7.8320, 9.5740 },
+                                                      { 2.2660, 1.9950,  1.2120, 8.0080, 7.2190 },
+                                                      { 8.8500, 5.6810,  4.5520, 1.3020, 5.7300 },
+                                                      { 6.7750, -2.253,  2.9080, 3.9700, 6.2910 }};
+    AGHMatrix<double> mat_gauss_test(init_gauss_test);
+    std::cout << std::fixed;
+    std::cout << "eliminacja Gaussa:\n";
+    std::cout << std::setprecision(8) << mat_gauss_test.gauss_elimination() << std::endl;
+
+    //zadanie6
+    std::cout << std::fixed;
+    std::cout << "metoda Jacobiego:\n";
+    std::cout << std::setprecision(8) << mat_gauss_test.jacobi_method() << std::endl;
+
     return 0;
 }

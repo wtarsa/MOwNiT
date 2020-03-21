@@ -233,7 +233,7 @@ void AGHMatrix<T>::cholesky_decomposition(AGHMatrix<T> &L, AGHMatrix<T> &LT) {
 template<typename T>
 AGHMatrix<T> AGHMatrix<T>::gauss_elimination() {
     AGHMatrix result(rows, 1, 0);
-    for (int i = 0; i < rows; i++) {                    //Pivotisation
+    for (int i = 0; i < rows; i++) {
         for (int k = i + 1; k < rows; k++) {
             if (abs(matrix[i][i]) < abs(matrix[k][i])) {
                 for (int j = 0; j <= rows; j++) {
@@ -245,7 +245,7 @@ AGHMatrix<T> AGHMatrix<T>::gauss_elimination() {
         }
     }
 
-    for (int i = 0; i < rows - 1; i++) {            
+    for (int i = 0; i < rows - 1; i++) {
         for (int k = i + 1; k < rows; k++) {
             double t = matrix[k][i] / matrix[i][i];
             for (int j = 0; j <= rows; j++)
@@ -253,14 +253,48 @@ AGHMatrix<T> AGHMatrix<T>::gauss_elimination() {
         }
     }
 
-    for (int i = rows-1;i>=0;i--){
-        result.matrix[i][0]=matrix[i][rows];
-        for (int j=i+1;j<rows;j++) {
-            if (j != i) result.matrix[i][0] = result.matrix[i][0] - matrix[i][j] *result.matrix[j][0];
+    for (int i = rows - 1; i >= 0; i--) {
+        result.matrix[i][0] = matrix[i][rows];
+        for (int j = i + 1; j < rows; j++) {
+            if (j != i) result.matrix[i][0] = result.matrix[i][0] - matrix[i][j] * result.matrix[j][0];
         }
-        result.matrix[i][0]=result.matrix[i][0]/matrix[i][i];
+        result.matrix[i][0] = result.matrix[i][0] / matrix[i][i];
+    }
+    return result;
+}
+
+template<typename T>
+AGHMatrix<T> AGHMatrix<T>::jacobi_method() {
+    AGHMatrix result(rows, 1, 0);
+    AGHMatrix tmp(rows, 1, 0);
+    AGHMatrix N(rows, 1, 0);
+    AGHMatrix LU(rows, rows, 0);
+
+    for (int i = 0; i < rows; i++) {
+        N.matrix[i][0] = 1 / matrix[i][i];
     }
 
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < rows; j++) {
+            if (i == j) {
+                LU.matrix[i][j] = 0;
+            } else {
+                LU.matrix[i][j] = -(matrix[i][j] * N.matrix[i][0]);
+            }
+        }
+    }
+
+    for (int k = 0; k < 25; k++) {
+        for (int i = 0; i < rows; i++) {
+            tmp.matrix[i][0] = N.matrix[i][0] * matrix[i][rows];
+            for (int j = 0; j < rows; j++)
+                tmp.matrix[i][0] += LU.matrix[i][j] * result.matrix[j][0];
+        }
+        for (int i = 0; i < rows; i++)
+            result.matrix[i][0] = tmp.matrix[i][0];
+    }
+
+    return result;
 }
 
 
