@@ -180,6 +180,89 @@ AGHMatrix<T> AGHMatrix<T>::transpose() {
     return result;
 }
 
+template<typename T>
+void AGHMatrix<T>::LU_decomposition(AGHMatrix<T> &L, AGHMatrix<T> &U) {
+    for(int i = 0; i < rows; i++){
+        L.matrix[i][i] = 1;
+    }
+    for(int i = rows; i > 0; i--){ // for each row and column
+        for(int c = cols-i; c < cols; c++){ // row in U matrix
+            U.matrix[rows-i][c] = 1;
+            double tmp = 0;
+            for(int j = 0; j < cols; j++){ // multiplication
+                if(j == rows-i) U.matrix[rows-i][c] *= U.matrix[j][c];
+                else tmp += L.matrix[rows-i][j]*U.matrix[j][c];
+            }
+            U.matrix[rows-i][c] = (matrix[rows-i][c]-tmp)/U.matrix[rows-i][c];
+        }
+
+        for(int r = rows-i; r < rows; r++){ // col in L matrix
+            L.matrix[r][cols-i] = 1;
+            double tmp = 0;
+            for(int j = 0; j < cols; j++){ // multiplication
+                if(j == cols-i) L.matrix[r][cols-i] *= U.matrix[j][cols-i];
+                else tmp += L.matrix[r][j]*U.matrix[j][cols-i];
+            }
+            L.matrix[r][cols-i] = (matrix[r][cols-i]-tmp)/L.matrix[r][cols-i];
+        }
+    }
+}
+
+template<typename T>
+void AGHMatrix<T>::cholesky_decomposition(AGHMatrix<T> &L, AGHMatrix<T> &LT) {
+    for(int i = 0; i < rows; i++){
+        for(int j = 0; j <= i; j++){
+            double tmp = 0;
+            if(i == j){
+                for(int k = 0; k < j; k++){
+                    tmp += pow(L.matrix[j][k], 2);
+                }
+                L.matrix[j][j] = sqrt(matrix[j][i] - tmp);
+            }
+            else{
+                for(int k = 0; k < j; k++){
+                    tmp += (L.matrix[i][k]*L.matrix[j][k]);
+                }
+                L.matrix[i][j] = (matrix[i][j] - tmp)/L.matrix[j][j];
+            }
+        }
+    }
+    LT = L.transpose();
+}
+
+template<typename T>
+AGHMatrix<T> AGHMatrix<T>::gauss_elimination() {
+    AGHMatrix result(rows, 1, 0);
+    for (int i = 0; i < rows; i++) {                    //Pivotisation
+        for (int k = i + 1; k < rows; k++) {
+            if (abs(matrix[i][i]) < abs(matrix[k][i])) {
+                for (int j = 0; j <= rows; j++) {
+                    double temp = matrix[i][j];
+                    matrix[i][j] = matrix[k][j];
+                    matrix[k][j] = temp;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < rows - 1; i++) {            
+        for (int k = i + 1; k < rows; k++) {
+            double t = matrix[k][i] / matrix[i][i];
+            for (int j = 0; j <= rows; j++)
+                matrix[k][j] = matrix[k][j] - t*matrix[i][j];
+        }
+    }
+
+    for (int i = rows-1;i>=0;i--){
+        result.matrix[i][0]=matrix[i][rows];
+        for (int j=i+1;j<rows;j++) {
+            if (j != i) result.matrix[i][0] = result.matrix[i][0] - matrix[i][j] *result.matrix[j][0];
+        }
+        result.matrix[i][0]=result.matrix[i][0]/matrix[i][i];
+    }
+
+}
+
 
 // Printing matrix                                                                                                                        
 template<typename T>

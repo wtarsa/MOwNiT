@@ -43,6 +43,10 @@ public:
 
     AGHMatrix<T> transpose();
 
+    void LU_decomposition(AGHMatrix<T> &L, AGHMatrix<T> &U);
+    void cholesky_decomposition(AGHMatrix<T> &L, AGHMatrix<T> &LT);
+
+    AGHMatrix<T> gauss_elimination();
 };
 
 #include "aghMatrix.cpp"
