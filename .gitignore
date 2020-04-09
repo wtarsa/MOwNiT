@@ -18,3 +18,6 @@ lab2/zadanie1/CMakeLists.txt
 lab3/tasks/cmake-build-debug
 lab3/tasks/CMakeLists.txt
 lab3/tasks/.idea
+lab4/cmake-build-debug
+lab4/CMakeLists.txt
+lab4/.idea
