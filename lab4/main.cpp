@@ -250,6 +250,23 @@ std::vector<point> interpolateHermiteUsingChebyshev(int pointsNumber){
     return results;
 }
 
+double hermiteError(int n, bool chebyshev){
+    double error = 0.0;
+    double interval = 6.0/10000;
+    std::vector<point> results;
+    if(!chebyshev) {
+        results = interpolateHermiteAllRange(n);
+    }
+    else{
+        results = interpolateHermiteUsingChebyshev(n);
+    }
+    for(int i = 0; i < 10001; i++){
+        error += std::abs(function(i*interval-3.0) - results[i].y);
+    }
+    return error;
+}
+
+
 int main(int argc, char** argv) {
     if(argc > 1){
         if(strcmp(argv[1], "funcx") == 0){
@@ -392,6 +409,18 @@ int main(int argc, char** argv) {
             for(point result: results){
                 std::cout << std::fixed;
                 std::cout << std::setprecision(5) << result.x << std::endl;
+            }
+        }
+        else if(strcmp(argv[1], "errorher") == 0){
+            for(int i = 2; i < 100; i++) {
+                std::cout << std::fixed;
+                std::cout << std::setprecision(5) << i << " : " << hermiteError(i, false) << std::endl;
+            }
+        }
+        else if(strcmp(argv[1], "errorherc") == 0){
+            for(int i = 2; i < 100; i++) {
+                std::cout << std::fixed;
+                std::cout << std::setprecision(5) << i << " : " << hermiteError(i, true) << std::endl;
             }
         }
     }

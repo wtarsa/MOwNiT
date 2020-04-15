@@ -25,7 +25,7 @@ subplot = figure.add_subplot()
 subplot.plot(axisX, axisY, marker=',')
 subplot.plot(axisX, axisYfunc, marker=',')
 
-subplot.set_title("Interpolacja metodą Hermite'a (węzły Czebyszewa) - liczba węzłów N = 20")
+subplot.set_title("Interpolacja metodą Hermite'a - liczba węzłów N = 35")
 subplot.set_xlabel('oś X')
 subplot.set_ylabel('oś Y')
 
