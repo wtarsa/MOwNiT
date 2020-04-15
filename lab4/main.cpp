@@ -177,6 +177,8 @@ double newtonError(int n, bool chebyshev){
     return error;
 }
 
+//metoda hermite'a
+
 std::vector<std::vector<double>> dividedDifferenceTableHermite(std::vector<point> values, int n){
     std::vector<std::vector<double>> result;
     std::vector<double> empty_vec;
@@ -191,44 +193,18 @@ std::vector<std::vector<double>> dividedDifferenceTableHermite(std::vector<point
     }
 
     for(int i = 0; i < 2*n; i++){
-        result[i][0] = values2[i].y;
-    }
-
-    for(int i = 1; i < 2*n; i++){
-        if(i%2 == 1){ // pochodna
-            result[i][1] = derivative(values2[i].x);
-        }
-        else{
-            result[i][1] = (result[i-1][0] - result[i][0])/
-                           (values2[i-1].x - values2[i].x);
-        }
-    }
-
-    for(int i = 2; i < 2*n-1; i++){
-        for(int j = i; j < 2*n; j++){
-            result[j][i] = 0.0;
-            result[j][i] = (result[j][i-1] - result[j-1][i-1])/
-                           (values2[j].x - values2[j-i].x);
+        for(int j = 0; j < i+1; j++){
+            if(j == 0) result[i][j] = function(values2[i].x);
+            else if(j == 1 && i%2 == 1) result[i][j] = derivative(values2[i].x);
+            else{
+                result[i][j] = result[i][j-1] - result[i-1][j-1];
+                result[i][j] = result[i][j] / (values2[i].x - values2[i-j].x);
+            }
         }
     }
 
     return result;
-}
-
-double componentHermite(int n, double x, std::vector<point> values){
-    std::vector<point> values2;
-
-    for(int i = 0; i < n; i++){
-        values2.push_back(values[i]);
-        values2.push_back(values[i]);
-    }
-
-    double result = 1;
-    for(int i = 0; i < n; i++){
-        result = result * (x - values2[i].x);
-    }
-    return result;
-}
+ }
 
 double interpolateHermite(std::vector<point> values, int n, double x){
     std::vector<point> values2;
@@ -239,16 +215,31 @@ double interpolateHermite(std::vector<point> values, int n, double x){
     }
 
     std::vector<std::vector<double>> y = dividedDifferenceTableHermite(values, n);
-    double sum = y[0][0];
-    for(int i = 1; i < 2*n; i++){
-        sum = sum + (componentHermite(i, x, values2) * y[i][i]);
+    double result = 0.0;
+    double component = 1.0;
+    for(int i = 0; i < 2*n; i++){
+        result = result + y[i][i] * component;
+        component = component * (x - values2[i].x);
     }
-    return sum;
+    return result;
 }
 
 std::vector<point> interpolateHermiteAllRange(int pointsNumber){
     std::vector<point> results;
     std::vector<point> values = getValueInPoints(function, pointsNumber, -3.0, 3.0);
+    double interval = 6.0/(10000);
+    for(int i = 0; i < 10001; i++){
+        point p;
+        p.x = interval*i-3.0;
+        p.y = interpolateHermite(values, pointsNumber, p.x);
+        results.push_back(p);
+    }
+    return results;
+}
+
+std::vector<point> interpolateHermiteUsingChebyshev(int pointsNumber){
+    std::vector<point> results;
+    std::vector<point> values = getChebyshevPoints(function, pointsNumber);
     double interval = 6.0/(10000);
     for(int i = 0; i < 10001; i++){
         point p;
@@ -373,15 +364,31 @@ int main(int argc, char** argv) {
         else if(strcmp(argv[1], "hery") == 0){
             int number = atoi(argv[2]);
             std::vector<point> results = interpolateHermiteAllRange(number);
-            int counter = 1;
             for(point result: results){
                 std::cout << std::fixed;
-                std::cout << counter++  << " " << std::setprecision(5) << result.y << std::endl;
+                std::cout << std::setprecision(5) << result.y << std::endl;
             }
         }
         else if(strcmp(argv[1], "herx") == 0){
             int number = atoi(argv[2]);
             std::vector<point> results = interpolateHermiteAllRange(number);
+            for(point result: results){
+                std::cout << std::fixed;
+                std::cout << std::setprecision(5) << result.x << std::endl;
+            }
+        }
+
+        else if(strcmp(argv[1], "hercy") == 0){
+            int number = atoi(argv[2]);
+            std::vector<point> results = interpolateHermiteUsingChebyshev(number);
+            for(point result: results){
+                std::cout << std::fixed;
+                std::cout << std::setprecision(5) << result.y << std::endl;
+            }
+        }
+        else if(strcmp(argv[1], "hercx") == 0){
+            int number = atoi(argv[2]);
+            std::vector<point> results = interpolateHermiteUsingChebyshev(number);
             for(point result: results){
                 std::cout << std::fixed;
                 std::cout << std::setprecision(5) << result.x << std::endl;
